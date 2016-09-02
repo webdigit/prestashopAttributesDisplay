@@ -43,7 +43,7 @@ class WdPsAdmin extends Module {
 		if (Shop::isFeatureActive ())
 			Shop::setContext ( Shop::CONTEXT_ALL );
 		
-		if (! parent::install () || ! $this->registerHook ( 'leftColumn' ) || ! $this->registerHook ( 'header' ) || ! $this->registerHook ( 'dashboardZoneOne' ) || ! $this->registerHook ( 'dashboardZoneTwo' ) || ! $this->registerHook ( 'dashboardData' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_PS_ADMIN' ))
+		if (! parent::install () || ! $this->registerHook ( 'leftColumn' ) || ! $this->registerHook ( 'header' ) || ! $this->registerHook ( 'footer' ) || ! $this->registerHook ( 'dashboardZoneOne' ) || ! $this->registerHook ( 'dashboardZoneTwo' ) || ! $this->registerHook ( 'dashboardData' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_PS_ADMIN' ))
 			return false;
 		
 		return true;
@@ -147,5 +147,12 @@ class WdPsAdmin extends Module {
 		}
 		
 		return $helper->generateForm ( $fields_form );
+	}
+	public function hookDisplayFooter($params)
+	{
+		if(Configuration::get ( 'wd_ps_admin_render_homedeclinaisons' ) && Configuration::get ( 'wd_ps_admin_render_homedeclinaisons' ) == 1){
+			return 'test';
+		}
+		
 	}
 }
