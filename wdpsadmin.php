@@ -2,6 +2,9 @@
 if (! defined ( '_PS_VERSION_' ))
 	exit ();
 class WdPsAdmin extends Module {
+	
+	protected static $cache_htmlDeclinaisons;
+	
 	public function __construct() {
 		$this->name = 'wdpsadmin';
 		$this->tab = 'front_office_features';
@@ -43,7 +46,7 @@ class WdPsAdmin extends Module {
 		if (Shop::isFeatureActive ())
 			Shop::setContext ( Shop::CONTEXT_ALL );
 		
-		if (! parent::install () || ! $this->registerHook ( 'leftColumn' ) || ! $this->registerHook ( 'header' ) || ! $this->registerHook ( 'footer' ) || ! $this->registerHook ( 'dashboardZoneOne' ) || ! $this->registerHook ( 'dashboardZoneTwo' ) || ! $this->registerHook ( 'dashboardData' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_PS_ADMIN' ))
+		if (! parent::install () || ! $this->registerHook ( 'leftColumn' ) || ! $this->registerHook ( 'header' ) || ! $this->registerHook ( 'footer' ) || ! $this->registerHook ( 'displayProductDeclinaisons' ) || ! $this->registerHook ( 'dashboardZoneOne' ) || ! $this->registerHook ( 'dashboardZoneTwo' ) || ! $this->registerHook ( 'dashboardData' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_PS_ADMIN' ))
 			return false;
 		
 		return true;
@@ -63,7 +66,7 @@ class WdPsAdmin extends Module {
 				if (! $config_label_value || empty ( $config_label_value ) || ! Validate::isGenericName ( $config_label_value ))
 					$output .= $this->displayError ( $this->l ( 'Invalid Configuration value' ) );
 				else {
-					Configuration::updateValue ( $config_input ['name'], $config_label_value );
+					Configuration::updateValue ( $config_input['name'], $config_label_value );
 					$output .= $this->displayConfirmation ( $this->l ( 'Settings updated' ) );
 				}
 			}
@@ -157,6 +160,30 @@ class WdPsAdmin extends Module {
 			}
 		}
 		return $html_render;
+	}
+	public function hookDisplayProductDeclinaisons($params)
+	{		
+		$this->smarty->assign(array(
+				'combinaisons' => $this->retrieveCombinaisons($params['id_product']),
+				'product_id' => $product_id
+		));
+		return $this->display(__FILE__, 'htmlDeclinaisons.tpl');
+	}
+	public function retrieveCombinaisons($product_id){
+				
+		$product = new Product ($product_id, $this->context->language->id);
+		$combinaisons = $product->getAttributeCombinations($this->context->language->id);
 		
+		/*
+		 * On réorganise les combinaisons, car chaque ligne correspond à un attribut.
+		 * Nous on souhaite p.ex : Taille/couleur : S/vert, M/vert, L/vert, S/jaune, M/jaune, L/jaune 
+		 */
+		$group_name = array();
+		foreach($combinaisons as $key=>$comb){
+			$group_name[$comb['id_attribute_group']] = $comb['group_name'];
+		}
+		$combinaisons['group_name'] = $group_name;
+		
+		return $combinaisons;
 	}
 }
