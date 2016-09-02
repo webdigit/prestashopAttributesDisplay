@@ -150,9 +150,13 @@ class WdPsAdmin extends Module {
 	}
 	public function hookDisplayFooter($params)
 	{
-		if(Configuration::get ( 'wd_ps_admin_render_homedeclinaisons' ) && Configuration::get ( 'wd_ps_admin_render_homedeclinaisons' ) == 1){
-			return 'test';
+		$html_render = '';
+		foreach ( $this->config_inputs as $config_input ) {
+			if(Configuration::get ( $config_input['name'] ) && Configuration::get ( $config_input['name'] ) == 1){
+				$html_render .= $config_input['name'].'<br />';
+			}
 		}
+		return $html_render;
 		
 	}
 }
