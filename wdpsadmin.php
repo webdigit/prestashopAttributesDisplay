@@ -2,9 +2,7 @@
 if (! defined ( '_PS_VERSION_' ))
 	exit ();
 class WdPsAdmin extends Module {
-	
 	protected static $cache_htmlDeclinaisons;
-	
 	public function __construct() {
 		$this->name = 'wdpsadmin';
 		$this->tab = 'front_office_features';
@@ -66,7 +64,7 @@ class WdPsAdmin extends Module {
 				if (! $config_label_value || empty ( $config_label_value ) || ! Validate::isGenericName ( $config_label_value ))
 					$output .= $this->displayError ( $this->l ( 'Invalid Configuration value' ) );
 				else {
-					Configuration::updateValue ( $config_input['name'], $config_label_value );
+					Configuration::updateValue ( $config_input ['name'], $config_label_value );
 					$output .= $this->displayConfirmation ( $this->l ( 'Settings updated' ) );
 				}
 			}
@@ -82,20 +80,20 @@ class WdPsAdmin extends Module {
 		$options = array (
 				array (
 						'id_option' => 1, // The value of the 'value' attribute of the <option> tag.
-						'name' => 'activé'
+						'name' => 'activé' 
 				), // The value of the text content of the <option> tag.
 				array (
 						'id_option' => 2,
-						'name' => 'désactivé'
-				)
+						'name' => 'désactivé' 
+				) 
 		);
 		
 		$inputs = array ();
 		foreach ( $this->config_inputs as $config_input ) {
 			array_push ( $inputs, array (
 					'type' => 'select',
-					'label' => $config_input['label'],
-					'name' => $config_input['name'],
+					'label' => $config_input ['label'],
+					'name' => $config_input ['name'],
 					'required' => true,
 					'options' => array (
 							'query' => $options,
@@ -146,44 +144,51 @@ class WdPsAdmin extends Module {
 		
 		// Load current value
 		foreach ( $this->config_inputs as $config_input ) {
-			$helper->fields_value [$config_input['name']] = Configuration::get ( $config_input['name'] );
+			$helper->fields_value [$config_input ['name']] = Configuration::get ( $config_input ['name'] );
 		}
 		
 		return $helper->generateForm ( $fields_form );
 	}
-	public function hookDisplayFooter($params)
-	{
+	public function hookDisplayFooter($params) {
 		$html_render = '';
 		foreach ( $this->config_inputs as $config_input ) {
-			if(Configuration::get ( $config_input['name'] ) && Configuration::get ( $config_input['name'] ) == 1){
-				$html_render .= $config_input['name'].'<br />';
+			if (Configuration::get ( $config_input ['name'] ) && Configuration::get ( $config_input ['name'] ) == 1) {
+				$html_render .= $config_input ['name'] . '<br />';
 			}
 		}
 		return $html_render;
 	}
-	public function hookDisplayProductDeclinaisons($params)
-	{		
-		$this->smarty->assign(array(
-				'combinaisons' => $this->retrieveCombinaisons($params['id_product']),
-				'product_id' => $product_id
-		));
-		return $this->display(__FILE__, 'htmlDeclinaisons.tpl');
+	public function hookDisplayProductDeclinaisons($params) {
+		$this->smarty->assign ( array (
+				'combinaisons' => $this->retrieveCombinaisons ( $params ['id_product'] ),
+				'product_id' => $product_id 
+		) );
+		return $this->display ( __FILE__, 'htmlDeclinaisons.tpl' );
 	}
-	public function retrieveCombinaisons($product_id){
-				
-		$product = new Product ($product_id, $this->context->language->id);
-		$combinaisons = $product->getAttributeCombinations($this->context->language->id);
+	public function retrieveCombinaisons($product_id) {
+		// var_dump ( $product_id );
+		$product = new Product ( $product_id, $this->context->language->id );
+		$combinaisons = $product->getAttributeCombinations ( $this->context->language->id );
 		
 		/*
 		 * On réorganise les combinaisons, car chaque ligne correspond à un attribut.
-		 * Nous on souhaite p.ex : Taille/couleur : S/vert, M/vert, L/vert, S/jaune, M/jaune, L/jaune 
+		 * Nous on souhaite p.ex : Taille/couleur : S/vert, M/vert, L/vert, S/jaune, M/jaune, L/jaune
 		 */
-		$group_name = array();
-		foreach($combinaisons as $key=>$comb){
-			$group_name[$comb['id_attribute_group']] = $comb['group_name'];
+		$group_name = array ();
+		$group_name_string = '';
+		$group_name_combinaisons = array ();
+		foreach ( $combinaisons as $key => $comb ) {
+			if (! array_key_exists ( $comb ['id_attribute_group'], $group_name )) {
+				$group_name [$comb ['id_attribute_group']] = $comb ['group_name'];
+				$group_name_string .= $comb ['group_name'] . '/';
+			}
+			$group_name_combinaisons [$comb ['id_product_attribute']][] = $comb ['attribute_name'];
 		}
-		$combinaisons['group_name'] = $group_name;
+		$group_name_string = substr ( $group_name_string, 0, - 1 );
 		
+		$combinaisons ['group_name'] = $group_name;
+		$combinaisons ['group_name_string'] = $group_name_string;
+		$combinaisons ['group_name_combinaisons'] = $group_name_combinaisons;
 		return $combinaisons;
 	}
 }
