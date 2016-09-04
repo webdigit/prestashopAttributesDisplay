@@ -44,7 +44,7 @@ class WdPsAdmin extends Module {
 		if (Shop::isFeatureActive ())
 			Shop::setContext ( Shop::CONTEXT_ALL );
 		
-		if (! parent::install () || ! $this->registerHook ( 'leftColumn' ) || ! $this->registerHook ( 'header' ) || ! $this->registerHook ( 'footer' ) || ! $this->registerHook ( 'displayProductDeclinaisons' ) || ! $this->registerHook ( 'dashboardZoneOne' ) || ! $this->registerHook ( 'dashboardZoneTwo' ) || ! $this->registerHook ( 'dashboardData' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_PS_ADMIN' ))
+		if (! parent::install () || ! $this->registerHook ( 'displayProductPriceBlock' ) || ! $this->registerHook ( 'header' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_PS_ADMIN' ))
 			return false;
 		
 		return true;
@@ -149,7 +149,7 @@ class WdPsAdmin extends Module {
 		
 		return $helper->generateForm ( $fields_form );
 	}
-	public function hookDisplayFooter($params) {
+	/*public function hookDisplayFooter($params) {
 		$html_render = '';
 		foreach ( $this->config_inputs as $config_input ) {
 			if (Configuration::get ( $config_input ['name'] ) && Configuration::get ( $config_input ['name'] ) == 1) {
@@ -157,38 +157,136 @@ class WdPsAdmin extends Module {
 			}
 		}
 		return $html_render;
+	}*/
+	public function hookDisplayHeader($params) {
+		$allowed_controllers = array (
+				'index',
+				'product',
+				'category'
+		);
+		$_controller = $this->context->controller;
+		if (isset ( $_controller->php_self ) && in_array ( $_controller->php_self, $allowed_controllers )) {
+			$this->context->controller->addCss ( $this->_path . 'views/css/home.css', 'all' );
+			$this->context->controller->addJs ( $this->_path . 'views/js/home.js' );
+		}
 	}
-	public function hookDisplayProductDeclinaisons($params) {
+	public function hookDisplayProductPriceBlock($params) {
+		if (isset ( $params ['type'] ) && $params ['type'] == 'after_price') {
+			$_controller = $this->context->controller;
+			if($_controller->php_self == 'product'){
+				
+				$product_id = $params['product']->specificPrice['id_product'];
+				//$product_link = 'test';
+			}else{
+				$product_id = $params ['product'] ['id_product'];
+				//$product_link = $params ['product'] ['link'];
+			}
+			
+			$product = new Product ( $product_id, $this->context->language->id );
+			$link = new Link();
+			$product_link = $link->getProductLink($product);
+			
+			$this->smarty->assign ( array (
+					'combinaisons' => $this->retrieveCombinaisons ( $params ),
+					'product_id' => $product_id,
+					'product_link' => $product_link
+			) );
+			return $this->display ( __FILE__, 'htmlDeclinaisons.tpl');
+		}
+	}
+	/*public function hookDisplayProductDeclinaisons($params) {
 		$this->smarty->assign ( array (
 				'combinaisons' => $this->retrieveCombinaisons ( $params ['id_product'] ),
 				'product_id' => $product_id 
 		) );
+		
 		return $this->display ( __FILE__, 'htmlDeclinaisons.tpl' );
-	}
-	public function retrieveCombinaisons($product_id) {
-		// var_dump ( $product_id );
+	}*/
+	/*public function hookdisplayHomeTabContent($params) {
+		
+		$this->smarty->assign ( array (
+				'machin' => 'bonjour' 
+		) );
+	}*/
+	public function retrieveCombinaisons($params) {
+		$_controller = $this->context->controller;
+		if($_controller->php_self == 'product'){
+			$product_id = $params['product']->specificPrice['id_product'];
+			//$product_link = 'test';
+		}else{
+			$product_id = $params ['product'] ['id_product'];
+			//$product_link = $params['product']['link'];
+		}
 		$product = new Product ( $product_id, $this->context->language->id );
+		$link = new Link();
+		$product_link = $link->getProductLink($product).'#';
 		$combinaisons = $product->getAttributeCombinations ( $this->context->language->id );
 		
 		/*
 		 * On réorganise les combinaisons, car chaque ligne correspond à un attribut.
-		 * Nous on souhaite p.ex : Taille/couleur : S/vert, M/vert, L/vert, S/jaune, M/jaune, L/jaune
+		 * Avec lien sur les combinaisons
+		 * Nous on souhaite p.ex : Taille/couleur : S/vert M/vert L/vert S/jaune M/jaune L/jaune
 		 */
 		$group_name = array ();
 		$group_name_string = '';
 		$group_name_combinaisons = array ();
+		$group_name_combinaisons_string = '';
+		$link_combinaison = '';
 		foreach ( $combinaisons as $key => $comb ) {
+			//var_dump($comb['attribute_name']);
+			$attribute_name = $comb['attribute_name'];
+			$first_item = false;
+			$last_item = false;
+			if($key == 0){
+				$first_item = true;
+			}
+			if($key == count($combinaisons)-1){
+				$last_item = true;
+			}
 			if (! array_key_exists ( $comb ['id_attribute_group'], $group_name )) {
 				$group_name [$comb ['id_attribute_group']] = $comb ['group_name'];
 				$group_name_string .= $comb ['group_name'] . '/';
 			}
-			$group_name_combinaisons [$comb ['id_product_attribute']][] = $comb ['attribute_name'];
+			
+			if(! array_key_exists ( $comb ['id_product_attribute'], $group_name_combinaisons )){
+				//$link_combinaison .= '!exist-';
+				if($first_item){
+					//$link_combinaison .= 'first-';
+					$group_name_combinaisons_string .= '<a href="##link##">';
+				}elseif($last_item){
+					//$link_combinaison .= 'last-';
+					//$group_name_combinaisons_string .= '</a>';
+					//$group_name_combinaisons_string = str_replace('##link##',$product_link.$link_combinaison,$group_name_combinaisons_string);
+					//$link_combinaison = '';
+				}else{
+					//$link_combinaison .= 'change-';
+					$group_name_combinaisons_string .= '</a>';
+					$group_name_combinaisons_string = str_replace('##link##',strtolower($product_link.$link_combinaison),$group_name_combinaisons_string);
+					$group_name_combinaisons_string .= ' <a href="##link##">';
+					$link_combinaison = '';
+				}
+			}else{
+				//$link_combinaison .= 'add-';
+				$group_name_combinaisons_string .= '/';
+				//$link_combinaison .= '/';
+			}
+			$link_combinaison .= '/'.$comb ['id_attribute'].'-'.$comb ['group_name'].'-'.$attribute_name;
+			//var_dump($link_combinaison);
+			//var_dump($last_item);
+			$group_name_combinaisons_string .= $comb ['attribute_name'];
+			if($last_item){
+				$group_name_combinaisons_string .= '</a>';
+				$group_name_combinaisons_string = str_replace('##link##',strtolower($product_link.$link_combinaison),$group_name_combinaisons_string);
+				$link_combinaison = '';
+			}
+			$group_name_combinaisons [$comb ['id_product_attribute']] [] = $comb ['attribute_name'];
 		}
 		$group_name_string = substr ( $group_name_string, 0, - 1 );
 		
 		$combinaisons ['group_name'] = $group_name;
 		$combinaisons ['group_name_string'] = $group_name_string;
 		$combinaisons ['group_name_combinaisons'] = $group_name_combinaisons;
+		$combinaisons ['group_name_combinaisons_string'] = $group_name_combinaisons_string;
 		return $combinaisons;
 	}
 }

@@ -1,0 +1,13 @@
+.wdpsadmin{
+	position:absolute;
+	top:0px;
+    background-color: black;
+    opacity:0.6;
+    z-index: 10;
+    color: white;
+    padding: 5px;
+}
+.wdpsadmin a, wdpsadmin a:hover{
+    color: white;
+    cursor: pointer;
+}
