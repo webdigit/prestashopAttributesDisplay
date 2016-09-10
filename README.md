@@ -1,2 +1,2 @@
-# prestashopAttributesHover
-WEBDIGIT Attributes Hover
+# prestashopAttributesDisplay
+WEBDIGIT Attributes Display
