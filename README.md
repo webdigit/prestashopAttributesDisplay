@@ -1,2 +1,2 @@
-# wd_ps_admin
-WEBDIGIT PRESTASHOP admin
+# prestashopAttributesHover
+WEBDIGIT Attributes Hover
