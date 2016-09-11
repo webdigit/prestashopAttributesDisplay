@@ -16,23 +16,106 @@ class WebdigitAttributesDisplay extends Module {
 		
 		parent::__construct ();
 		
-		$this->displayName = $this->l ( 'Webdigit Attributes Display' );
-		$this->description = $this->l ( 'Ajout de l\'affichage de déclinaisons' );
+		$this->displayName = $this->l ( 'Products Attributes Display' );
+		$this->description = $this->l ( 'Permet l\'affichage des déclinaisons dans les listes produits' );
 		
 		$this->confirmUninstall = $this->l ( 'Are you sure you want to uninstall?' );
 		
 		$this->config_inputs = array (
 				array (
-						'name' => 'wd_ps_admin_render_homedeclinaisons',
-						'label' => '[HOMEPAGE] Affichage des déclinaisons' 
+						'name' => 'wd_attr_displ_render',
+						'label' => 'Affichage des déclinaisons',
+						'type' => 'select',
+						'options' => array (
+								array (
+										'id_option' => 1,
+										'name' => 'activé' 
+								),
+								array (
+										'id_option' => 2,
+										'name' => 'désactivé' 
+								) 
+						) 
 				),
 				array (
-						'name' => 'wd_ps_admin_render_homereservations',
-						'label' => '[HOMEPAGE] Affichage des réservations' 
+						'name' => 'wd_attr_displ_selectors',
+						'label' => 'Classes des conteneurs de listes (séparé par une virgule)',
+						'type' => 'text'
 				),
 				array (
-						'name' => 'wd_ps_admin_render_productdeliverydelay',
-						'label' => '[PRODUCT PAGE] Affichage des délais de livraison' 
+						'name' => 'wd_attr_displ_type',
+						'label' => 'Type de rendu d\'affichage de la box des déclinaisons',
+						'type' => 'select',
+						'options' => array (
+								array (
+										'id_option' => 1,
+										'name' => 'activé' 
+								),
+								array (
+										'id_option' => 2,
+										'name' => 'désactivé' 
+								) 
+						) 
+				),
+				array (
+						'name' => 'wd_attr_displ_position',
+						'label' => 'Position de l\'affiche de la box dans les conteneurs de listes',
+						'type' => 'select',
+						'options' => array (
+								array (
+										'id_option' => 1,
+										'name' => 'activé' 
+								),
+								array (
+										'id_option' => 2,
+										'name' => 'désactivé' 
+								) 
+						) 
+				),
+				array (
+						'name' => 'wd_attr_displ_format',
+						'label' => 'Type d\'affichage des attributs',
+						'type' => 'select',
+						'options' => array (
+								array (
+										'id_option' => 1,
+										'name' => 'activé' 
+								),
+								array (
+										'id_option' => 2,
+										'name' => 'désactivé' 
+								) 
+						) 
+				),
+				array (
+						'name' => 'wd_attr_displ_outstock',
+						'label' => 'Affichage des combinaisons hors stock (pour le type d\'affiche attributs "combinaisons")',
+						'type' => 'select',
+						'options' => array (
+								array (
+										'id_option' => 1,
+										'name' => 'activé' 
+								),
+								array (
+										'id_option' => 2,
+										'name' => 'désactivé' 
+								) 
+						) 
+				),
+				array (
+						'name' => 'wd_attr_displ_page',
+						'label' => 'Affichage de la box pour les pages suivantes',
+						'type' => 'select',
+						'options' => array (
+								array (
+										'id_option' => 1,
+										'name' => 'activé' 
+								),
+								array (
+										'id_option' => 2,
+										'name' => 'désactivé' 
+								) 
+						) 
 				) 
 		);
 		
@@ -76,26 +159,15 @@ class WebdigitAttributesDisplay extends Module {
 		
 		// Init Fields form array
 		
-		$options = array (
-				array (
-						'id_option' => 1, // The value of the 'value' attribute of the <option> tag.
-						'name' => 'activé' 
-				), // The value of the text content of the <option> tag.
-				array (
-						'id_option' => 2,
-						'name' => 'désactivé' 
-				) 
-		);
-		
 		$inputs = array ();
 		foreach ( $this->config_inputs as $config_input ) {
 			array_push ( $inputs, array (
-					'type' => 'select',
+					'type' => $config_input ['type'],
 					'label' => $config_input ['label'],
 					'name' => $config_input ['name'],
 					'required' => true,
 					'options' => array (
-							'query' => $options,
+							'query' => $config_input ['options'],
 							'id' => 'id_option',
 							'name' => 'name' 
 					) 
@@ -104,7 +176,7 @@ class WebdigitAttributesDisplay extends Module {
 		
 		$fields_form [0] ['form'] = array (
 				'legend' => array (
-						'title' => $this->l ( 'Settings WEBDIGIT Prestashop Admin' ) 
+						'title' => $this->l ( 'Paramétrage WEBDIGIT Prestashop attributes display' ) 
 				),
 				'input' => $inputs,
 				'submit' => array (
@@ -156,9 +228,11 @@ class WebdigitAttributesDisplay extends Module {
 		);
 		$_controller = $this->context->controller;
 		if (isset ( $_controller->php_self ) && in_array ( $_controller->php_self, $allowed_controllers )) {
-			$this->context->controller->addCss ( $this->_path . 'views/css/home.css', 'all' );
-			$this->context->controller->addJs ( $this->_path . 'views/js/home.js', 'all' );
+			$this->context->controller->addCss ( $this->_path . 'views/css/wdattrdispl.css', 'all' );
+			$this->context->controller->addJs ( $this->_path . 'views/js/wdattrdispl.js', 'all' );
 		}
+		$wdAttrDisplSelectors = Configuration::get ( 'wd_attr_displ_selectors' );
+		return '<script>var wdAttrDisplSelectors = "'.$wdAttrDisplSelectors.'";</script>';
 	}
 	public function hookDisplayProductPriceBlock($params) {
 		if (isset ( $params ['type'] ) && $params ['type'] == 'after_price') {
@@ -264,7 +338,7 @@ class WebdigitAttributesDisplay extends Module {
 					$link_combinaison = '';
 				} else {
 					// var_dump('add');
-					$link_combinaison .= 'add-';
+					// $link_combinaison .= 'add-';
 					// $link_combinaison .= '/' . $comb ['id_attribute'] . '-' . $comb ['group_name'] . '-' . $attribute_name;
 					$link_combinaison .= $this->generateUrl ( $comb ['id_attribute'], $comb ['group_name'], $attribute_name );
 					$group_name_combinaisons_string .= '/';
