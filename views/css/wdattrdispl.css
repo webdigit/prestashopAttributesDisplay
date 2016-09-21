@@ -1,4 +1,4 @@
-.wdpsadmin{
+/*.wdpsadmin*/.wdattrdisplay{
 	position:absolute;
 	top:0px;
     background-color: black;
@@ -7,7 +7,8 @@
     color: white;
     padding: 5px;
 }
-.wdpsadmin a, wdpsadmin a:hover{
+/*.wdpsadmin a, .wdpsadmin a:hover*/
+.wdattrdisplay a, .wdattrdisplay a:hover{
     color: white;
     cursor: pointer;
 }
