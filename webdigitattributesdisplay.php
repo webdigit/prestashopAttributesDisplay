@@ -48,12 +48,12 @@ class WebdigitAttributesDisplay extends Module {
 						'type' => 'select',
 						'options' => array (
 								array (
-										'id_option' => 1,
-										'name' => 'activé' 
+										'id_option' => 'hover',
+										'name' => 'hover' 
 								),
 								array (
-										'id_option' => 2,
-										'name' => 'désactivé' 
+										'id_option' => 'static',
+										'name' => 'static' 
 								) 
 						) 
 				),
@@ -221,18 +221,27 @@ class WebdigitAttributesDisplay extends Module {
 		return $helper->generateForm ( $fields_form );
 	}
 	public function hookDisplayHeader($params) {
+		// Vérifie dans quoi on se trouve
 		$allowed_controllers = array (
 				'index',
 				'product',
-				'category' 
+				'category'
 		);
 		$_controller = $this->context->controller;
+		// Flag si on se retrouve à ces endroits
 		if (isset ( $_controller->php_self ) && in_array ( $_controller->php_self, $allowed_controllers )) {
 			$this->context->controller->addCss ( $this->_path . 'views/css/wdattrdispl.css', 'all' );
 			$this->context->controller->addJs ( $this->_path . 'views/js/wdattrdispl.js', 'all' );
 		}
 		$wdAttrDisplSelectors = Configuration::get ( 'wd_attr_displ_selectors' );
-		return '<script>var wdAttrDisplSelectors = "'.$wdAttrDisplSelectors.'";</script>';
+		
+		// Types d'affichage
+		$wdAttrDisplType = Configuration::get ( 'wd_attr_displ_type' );
+		
+		return '<script>
+					var wdAttrDisplSelectors = "'.$wdAttrDisplSelectors.'";
+					var wdAttrDisplType = "'.$wdAttrDisplType.'";
+				</script>';
 	}
 	public function hookDisplayProductPriceBlock($params) {
 		if (isset ( $params ['type'] ) && $params ['type'] == 'after_price') {
