@@ -3,6 +3,7 @@ $(function(){
 			init: function(){
 				//console.log('combinaisons init');
 				this.boxSelector = wdAttrDisplSelectors;
+				this.boxSelectorType = wdAttrDisplType;
 				this.boxSelectorArray = this.boxSelector.split(',');
 				this.position = 100;
 				this.cacheDom();
@@ -13,6 +14,7 @@ $(function(){
 				//console.log('combinaisons cacheDom');
 				this.$wdpsadmin = $('.wdpsadmin');
 				this.$boxSelector = $(this.boxSelector);
+				this.$boxSelectorType = $(this.boxSelectorType);
 			},
 			displayElements : function(){
 				//console.log('combinaisons displayElements');
@@ -39,7 +41,8 @@ $(function(){
 			bindEvents: function(){
 				//console.log('combinaisons bindEvents');
 				this.$boxSelector.bind('mouseover',$.proxy(function(e){
-					$element = $(e.currentTarget);console.log($element);
+					$element = $(e.currentTarget);
+					//console.log($element);
 					var elementPositionTop = $element.position().top;
 					//console.log($element.position().top);
 					//console.log('combinaisons bindEvents mouseover');
@@ -59,5 +62,13 @@ $(function(){
 			}
 	}
 	//combinaisons.init();
-	window.setInterval(function(){combinaisons.init()}, 500);
+	
+	// Comportement pour Hover ou Static
+	if ( wdAttrDisplType == 'hover' ){
+		window.setInterval(function(){combinaisons.init()}, 500);
+	}
+	else {
+		$('.wdpsadmin').removeAttr('style');
+	}
+	
 });
