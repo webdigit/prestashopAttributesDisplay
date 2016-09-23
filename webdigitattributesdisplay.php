@@ -63,13 +63,29 @@ class WebdigitAttributesDisplay extends Module {
 						'type' => 'select',
 						'options' => array (
 								array (
-										'id_option' => 1,
-										'name' => 'activé' 
+										'id_option' => 'top',
+										'name' => 'top' 
 								),
 								array (
-										'id_option' => 2,
-										'name' => 'désactivé' 
-								) 
+										'id_option' => 'bottom',
+										'name' => 'bottom' 
+								),
+								array (
+										'id_option' => 'top_right',
+										'name' => 'top right'
+								),
+								array (
+										'id_option' => 'top_left',
+										'name' => 'top left'
+								),
+								array (
+										'id_option' => 'bottom_right',
+										'name' => 'bottom right'
+								),
+								array(
+										'id_option' => 'bottom_left',
+										'name' => 'bottom left'
+								)
 						) 
 				),
 				array (
@@ -116,17 +132,20 @@ class WebdigitAttributesDisplay extends Module {
 										'name' => 'désactivé' 
 								) 
 						) 
-				) 
+				)
 		);
 		
+
 		if (! Configuration::get ( 'WEBDIGIT_ATTRIBUTES_DISPLAY' ))
 			$this->warning = $this->l ( 'No name provided' );
+		
+	
 	}
 	public function install() {
 		if (Shop::isFeatureActive ())
 			Shop::setContext ( Shop::CONTEXT_ALL );
 		
-		if (! parent::install () || ! $this->registerHook ( 'displayProductPriceBlock' ) || ! $this->registerHook ( 'header' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_ATTRIBUTES_DISPLAY' ))
+		if (! parent::install () || ! $this->registerHook ( 'displayProductPriceBlock' ) || !$this->registerHook ( 'actionAdminControllerSetMedia' ) || ! $this->registerHook ( 'header' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_ATTRIBUTES_DISPLAY' ))
 			return false;
 		
 		return true;
@@ -238,9 +257,13 @@ class WebdigitAttributesDisplay extends Module {
 		// Types d'affichage
 		$wdAttrDisplType = Configuration::get ( 'wd_attr_displ_type' );
 		
+		// Position de l'affichage
+		$wdAttrDisplPosition = Configuration::get ( 'wd_attr_displ_position' );
+		
 		return '<script>
 					var wdAttrDisplSelectors = "'.$wdAttrDisplSelectors.'";
 					var wdAttrDisplType = "'.$wdAttrDisplType.'";
+					var wdAttrDisplPosition = "'.$wdAttrDisplPosition.'";
 				</script>';
 	}
 	public function hookDisplayProductPriceBlock($params) {
@@ -261,6 +284,13 @@ class WebdigitAttributesDisplay extends Module {
 			) );
 			return $this->display ( __FILE__, 'htmlDeclinaisons.tpl' );
 		}
+	}
+	
+	// Chargé js pour back office
+	public function hookActionAdminControllerSetMedia($params){
+		
+		$this->context->controller->addJS($this->_path.'views/js/wdattrdispl_admin.js');
+		
 	}
 	public function generateUrl($id_attribute, $group_name, $attribute_name) {
 		// return '/' . $id_attribute . '-' . $group_name . '-' . $attribute_name;
