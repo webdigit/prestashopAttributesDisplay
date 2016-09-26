@@ -58,7 +58,8 @@ $(function(){
 					//console.log($('.product-container').width());
 					$('.wdattrdisplay').hide();
 					var box_position = $element.offset();
-					//console.log(box_position);
+					var box_width = $element.outerWidth();
+					//console.log(box_width);
 					var box_height = $element.outerHeight();
 					//console.log(box_height);
 					
@@ -76,20 +77,25 @@ $(function(){
 						console.log( 'POSITION BOTTOM' );
 						break;
 					case 'top_right':
-						var position_element = elementPositionTop-((box_height/1000)*this.position)+20;
+						var position_element = elementPositionTop+((box_height/1000)*this.position)-40;
+						//$element.closest(this.boxSelector).find('.wdattrdisplay').offset({left : $element.outerWidth(this.$boxSelector.width())}).show();
+						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important; left: '+box_width+'px;' }).show();
 						console.log( 'POSITION TOP RIGHT' );
 						break;
 					case 'top_left':
-						var position_element = elementPositionTop-((box_height/1000)*this.position)+20;
-						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()/2).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important;' }).show();
+						var position_element = elementPositionTop-((box_height/1000)*this.position)+40;
+						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important; left: -'+box_width+'px;' }).show();
 						console.log('POSITION TOP LEFT');
 						break;
 					case 'bottom_right':
-						console.log('POSITION BOTTOM RIGHT')
+						var position_element = elementPositionTop+((box_height/100)*this.position)-10;
+						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important; left: '+box_width+'px;' }).show();
+						console.log('POSITION BOTTOM RIGHT');
+						break;
 					case 'bottom_left':
 						console.log('POSITION BOTTOM LEFT')
 						var position_element = elementPositionTop+((box_height/100)*this.position)-10;
-						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()/2).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important;' }).show();
+						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important; left: -'+box_width+'px;' }).show();
 						break;
 						default:break;
 					}
@@ -100,7 +106,7 @@ $(function(){
 					
 					//$element.closest(this.boxSelector).find('.wdattrdisplay').show();
 				},this)).bind('mouseleave',function(e){
-					if(e.relatedTarget.nodeName == 'li'){
+					if(e.relatedTarget.nodeName == 'LI'){
 						$('.wdattrdisplay').hide();
 					}
 				});	
