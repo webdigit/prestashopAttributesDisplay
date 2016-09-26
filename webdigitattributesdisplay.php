@@ -94,12 +94,12 @@ class WebdigitAttributesDisplay extends Module {
 						'type' => 'select',
 						'options' => array (
 								array (
-										'id_option' => 1,
-										'name' => 'activé' 
+										'id_option' => 'attribut',
+										'name' => 'attribut' 
 								),
 								array (
-										'id_option' => 2,
-										'name' => 'désactivé' 
+										'id_option' => 'combinaison',
+										'name' => 'combinaison' 
 								) 
 						) 
 				),
