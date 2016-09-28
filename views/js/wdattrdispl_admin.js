@@ -27,5 +27,18 @@ $(function(){
 			default:break;
 		}
 	});
+	
+	$('#wd_attr_displ_page').bind('change', function(e){
+		var value = $(this).val();
+		switch (value){
+		case 'active' :
+			$('#wd_attr_displ_page_choice').closest('.form-group').css('visibility','visible');
+			break;
+		case 'desactive' :
+			$('#wd_attr_displ_page_choice').closest('.form-group').css('visibility','hidden');
+			break;
+			default:break;
+		}
+	});
 
 })
