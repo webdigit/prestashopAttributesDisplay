@@ -28,11 +28,11 @@ class WebdigitAttributesDisplay extends Module {
 						'type' => 'select',
 						'options' => array (
 								array (
-										'id_option' => 1,
+										'id_option' => 'active',
 										'name' => 'activé' 
 								),
 								array (
-										'id_option' => 2,
+										'id_option' => 'desactive',
 										'name' => 'désactivé' 
 								) 
 						) 
@@ -124,14 +124,33 @@ class WebdigitAttributesDisplay extends Module {
 						'type' => 'select',
 						'options' => array (
 								array (
-										'id_option' => 1,
-										'name' => 'activé' 
+										'id_option' => 'active',
+										'name' => 'active' 
 								),
 								array (
-										'id_option' => 2,
-										'name' => 'désactivé' 
+										'id_option' => 'desactive',
+										'name' => 'desactive' 
 								) 
 						) 
+				),
+				array (
+						'name' => 'wd_attr_displ_page_choice',
+						'label' => 'Choix des pages',
+						'type' => 'select',
+						'options' => array (
+								array (
+										'id_option' => 'index',
+										'name' => 'index'
+								),
+								array (
+										'id_option' => 'produit',
+										'name' => 'produit'
+								),
+								array (
+										'id_option' => 'categorie',
+										'name' => 'categorie'
+								)
+						)
 				)
 		);
 		
@@ -252,6 +271,8 @@ class WebdigitAttributesDisplay extends Module {
 			$this->context->controller->addCss ( $this->_path . 'views/css/wdattrdispl.css', 'all' );
 			$this->context->controller->addJs ( $this->_path . 'views/js/wdattrdispl.js', 'all' );
 		}
+		$wdAttrDisplRender = Configuration::get ( 'wd_attr_displ_render' );
+		
 		$wdAttrDisplSelectors = Configuration::get ( 'wd_attr_displ_selectors' );
 		
 		// Types d'affichage
@@ -260,7 +281,10 @@ class WebdigitAttributesDisplay extends Module {
 		// Position de l'affichage
 		$wdAttrDisplPosition = Configuration::get ( 'wd_attr_displ_position' );
 		
+		
+		
 		return '<script>
+					var wdAttrDisplRender = "'.$wdAttrDisplRender.'";
 					var wdAttrDisplSelectors = "'.$wdAttrDisplSelectors.'";
 					var wdAttrDisplType = "'.$wdAttrDisplType.'";
 					var wdAttrDisplPosition = "'.$wdAttrDisplPosition.'";
@@ -328,6 +352,7 @@ class WebdigitAttributesDisplay extends Module {
 		$link_combinaison_array = array ();
 		foreach ( $combinaisons as $key => $comb ) {
 			$attribute_name = $comb ['attribute_name'];
+			//var_dump($attribute_name);
 			$first_item = false;
 			$last_item = false;
 			if ($key == 0) {
@@ -374,9 +399,10 @@ class WebdigitAttributesDisplay extends Module {
 					$link_combinaison .= 'replace-';
 					// $group_name_combinaisons_string = str_replace ( '##link##', iconv('UTF-8','ASCII//TRANSLIT',strtolower ( $product_link . $link_combinaison )), $group_name_combinaisons_string );
 					$group_name_combinaisons_string = $this->convertStrUrl ( $product_link . $link_combinaison, $group_name_combinaisons_string );
+					//var_dump($group_name_combinaisons_string);
 					$link_combinaison = '';
 				} else {
-					// var_dump('add');
+					 //var_dump('add');
 					// $link_combinaison .= 'add-';
 					// $link_combinaison .= '/' . $comb ['id_attribute'] . '-' . $comb ['group_name'] . '-' . $attribute_name;
 					$link_combinaison .= $this->generateUrl ( $comb ['id_attribute'], $comb ['group_name'], $attribute_name );
@@ -385,8 +411,8 @@ class WebdigitAttributesDisplay extends Module {
 				}
 			}
 			// $link_combinaison .= '/' . $comb ['id_attribute'] . '-' . $comb ['group_name'] . '-' . $attribute_name;
-			// var_dump($link_combinaison);
-			// var_dump($last_item);
+			//var_dump($link_combinaison);
+			//var_dump($last_item);
 			// $group_name_combinaisons_string .= $comb ['attribute_name'];
 			if ($last_item) {
 				$group_name_combinaisons_string .= '</a>';
@@ -398,8 +424,8 @@ class WebdigitAttributesDisplay extends Module {
 			$link_combinaison_array [$comb ['id_product_attribute']] .= $link_combinaison;
 		}
 		$group_name_string = substr ( $group_name_string, 0, - 1 );
-		// var_dump($link_combinaison_array);
-		// var_dump($group_name_combinaisons_string);
+		//var_dump($link_combinaison_array);
+		//var_dump($group_name_combinaisons_string);
 		$combinaisons ['group_name'] = $group_name;
 		$combinaisons ['group_name_string'] = $group_name_string;
 		$combinaisons ['group_name_combinaisons'] = $group_name_combinaisons;

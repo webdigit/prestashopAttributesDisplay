@@ -1,7 +1,17 @@
 $(function(){
+	if ( wdAttrDisplRender == 'desactive'){
+		console.log( wdAttrDisplRender );
+		$('.wdattrdisplay').css('visibility','hidden');
+	}
+	else {
+		console.log( wdAttrDisplRender );
+		$('.wdattrdisplay').css('visibility','visible');
+	}
+	
 	var combinaisons = {
 			init: function(){
 				//console.log('combinaisons init');
+				this.box = wdAttrDisplRender;
 				this.boxSelector = wdAttrDisplSelectors;
 				this.boxSelectorType = wdAttrDisplType;
 				this.boxSelectorPosition = wdAttrDisplPosition;
@@ -14,6 +24,7 @@ $(function(){
 			cacheDom: function(){
 				//console.log('combinaisons cacheDom');
 				this.$wbattrdisplay = $('.wdattrdisplay');
+				this.$box = $(this.box);
 				this.$boxSelector = $(this.boxSelector);
 				//console.log($(this.boxSelector));
 				this.$boxSelectorType = $(this.boxSelectorType);
@@ -69,31 +80,31 @@ $(function(){
 					case 'top':
 						var position_element = elementPositionTop-((box_height/1000)*this.position)+20;
 						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important;' }).show();
-						console.log( 'POSITION TOP' );
+						//console.log( 'POSITION TOP' );
 						break;
 					case 'bottom':
 						var position_element = elementPositionTop+((box_height/100)*this.position)-10;
 						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important;' }).show();
-						console.log( 'POSITION BOTTOM' );
+						//console.log( 'POSITION BOTTOM' );
 						break;
 					case 'top_right':
 						var position_element = elementPositionTop+((box_height/1000)*this.position)-40;
 						//$element.closest(this.boxSelector).find('.wdattrdisplay').offset({left : $element.outerWidth(this.$boxSelector.width())}).show();
 						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important; left: '+box_width+'px;' }).show();
-						console.log( 'POSITION TOP RIGHT' );
+						//console.log( 'POSITION TOP RIGHT' );
 						break;
 					case 'top_left':
 						var position_element = elementPositionTop-((box_height/1000)*this.position)+40;
 						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important; left: -'+box_width+'px;' }).show();
-						console.log('POSITION TOP LEFT');
+						//console.log('POSITION TOP LEFT');
 						break;
 					case 'bottom_right':
 						var position_element = elementPositionTop+((box_height/100)*this.position)-10;
 						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important; left: '+box_width+'px;' }).show();
-						console.log('POSITION BOTTOM RIGHT');
+						//console.log('POSITION BOTTOM RIGHT');
 						break;
 					case 'bottom_left':
-						console.log('POSITION BOTTOM LEFT')
+						//console.log('POSITION BOTTOM LEFT')
 						var position_element = elementPositionTop+((box_height/100)*this.position)-10;
 						$element.closest(this.boxSelector).find('.wdattrdisplay').outerWidth(this.$boxSelector.width()).attr('style', function(i,s) { return s + 'top: '+position_element+'px !important; left: -'+box_width+'px;' }).show();
 						break;
@@ -123,5 +134,7 @@ $(function(){
 	else {
 		$('.wdattrdisplay').removeAttr('style');
 	}
+	
+	
 	
 });
