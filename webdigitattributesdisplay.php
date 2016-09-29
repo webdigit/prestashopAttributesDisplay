@@ -40,7 +40,7 @@ class WebdigitAttributesDisplay extends Module {
 				array (
 						'name' => 'wd_attr_displ_selectors',
 						'label' => 'Classes des conteneurs de listes (séparé par une virgule)',
-						'type' => 'text'
+						'type' => 'text' 
 				),
 				array (
 						'name' => 'wd_attr_displ_type',
@@ -72,20 +72,20 @@ class WebdigitAttributesDisplay extends Module {
 								),
 								array (
 										'id_option' => 'top_right',
-										'name' => 'top right'
+										'name' => 'top right' 
 								),
 								array (
 										'id_option' => 'top_left',
-										'name' => 'top left'
+										'name' => 'top left' 
 								),
 								array (
 										'id_option' => 'bottom_right',
-										'name' => 'bottom right'
+										'name' => 'bottom right' 
 								),
-								array(
+								array (
 										'id_option' => 'bottom_left',
-										'name' => 'bottom left'
-								)
+										'name' => 'bottom left' 
+								) 
 						) 
 				),
 				array (
@@ -121,50 +121,49 @@ class WebdigitAttributesDisplay extends Module {
 				array (
 						'name' => 'wd_attr_displ_page',
 						'label' => 'Affichage de la box pour les pages suivantes',
-						'type' => 'select',
-						'options' => array (
+						'type' => 'checkbox',
+						/*'options' => array (
 								array (
-										'id_option' => 'active',
-										'name' => 'active' 
+										'id_option' => 'index00',
+										'name' => 'Index00' 
 								),
 								array (
-										'id_option' => 'desactive',
-										'name' => 'desactive' 
+										'id_option' => 'product00',
+										'name' => 'Produit00' 
+								),
+								array (
+										'id_option' => 'category00',
+										'name' => 'Catégorie00' 
 								) 
-						) 
-				),
-				array (
-						'name' => 'wd_attr_displ_page_choice',
-						'label' => 'Choix des pages',
-						'type' => 'select',
-						'options' => array (
+						),*/
+						'values' => array (
 								array (
 										'id_option' => 'index',
-										'name' => 'index'
+										'name' => 'Index',
+										'val' => 1,
 								),
 								array (
-										'id_option' => 'produit',
-										'name' => 'produit'
+										'id_option' => 'product',
+										'name' => 'Produit',
+										'val' => 1
 								),
 								array (
-										'id_option' => 'categorie',
-										'name' => 'categorie'
-								)
-						)
-				)
+										'id_option' => 'category',
+										'name' => 'Catégorie',
+										'val' => 1
+								) 
+						) 
+				) 
 		);
 		
-
 		if (! Configuration::get ( 'WEBDIGIT_ATTRIBUTES_DISPLAY' ))
 			$this->warning = $this->l ( 'No name provided' );
-		
-	
 	}
 	public function install() {
 		if (Shop::isFeatureActive ())
 			Shop::setContext ( Shop::CONTEXT_ALL );
 		
-		if (! parent::install () || ! $this->registerHook ( 'displayProductPriceBlock' ) || !$this->registerHook ( 'actionAdminControllerSetMedia' ) || ! $this->registerHook ( 'header' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_ATTRIBUTES_DISPLAY' ))
+		if (! parent::install () || ! $this->registerHook ( 'displayProductPriceBlock' ) || ! $this->registerHook ( 'actionAdminControllerSetMedia' ) || ! $this->registerHook ( 'header' ) || ! Configuration::updateValue ( 'MYMODULE_NAME', 'WEBDIGIT_ATTRIBUTES_DISPLAY' ))
 			return false;
 		
 		return true;
@@ -180,12 +179,28 @@ class WebdigitAttributesDisplay extends Module {
 		if (Tools::isSubmit ( 'submit' . $this->name )) {
 			
 			foreach ( $this->config_inputs as $config_input ) {
-				$config_label_value = strval ( Tools::getValue ( $config_input ['name'] ) );
-				if (! $config_label_value || empty ( $config_label_value ) || ! Validate::isGenericName ( $config_label_value ))
-					$output .= $this->displayError ( $this->l ( 'Invalid Configuration value' ) );
-				else {
-					Configuration::updateValue ( $config_input ['name'], $config_label_value );
-					$output .= $this->displayConfirmation ( $this->l ( 'Settings updated' ) );
+				
+				if ($config_input ['type'] == 'checkbox') {
+					foreach ( $config_input ['values'] as $value ) {
+						$config_label_value = strval ( Tools::getValue ( $config_input ['name'] . '_' . $value ['id_option'] ) );
+						if (! Validate::isGenericName ( $config_label_value )){
+							$output .= $this->displayError ( $this->l ( 'Invalid Configuration value' ) );
+						}elseif(! $config_label_value || empty ( $config_label_value )){
+							Configuration::updateValue ( $config_input ['name'] . '_' . $value ['id_option'], '0' );
+							$output .= $this->displayConfirmation ( $this->l ( 'Settings updated' ) );
+						}else{
+							Configuration::updateValue ( $config_input ['name'] . '_' . $value ['id_option'], $config_label_value );
+							$output .= $this->displayConfirmation ( $this->l ( 'Settings updated' ) );
+						}
+					}
+				} else {
+					$config_label_value = strval ( Tools::getValue ( $config_input ['name'] ) );
+					if (! $config_label_value || empty ( $config_label_value ) || ! Validate::isGenericName ( $config_label_value ))
+						$output .= $this->displayError ( $this->l ( 'Invalid Configuration value' ) );
+					else {
+						Configuration::updateValue ( $config_input ['name'], $config_label_value );
+						$output .= $this->displayConfirmation ( $this->l ( 'Settings updated' ) );
+					}
 				}
 			}
 		}
@@ -206,6 +221,11 @@ class WebdigitAttributesDisplay extends Module {
 					'required' => true,
 					'options' => array (
 							'query' => $config_input ['options'],
+							'id' => 'id_option',
+							'name' => 'name' 
+					),
+					'values' => array (
+							'query' => $config_input ['values'],
 							'id' => 'id_option',
 							'name' => 'name' 
 					) 
@@ -254,6 +274,9 @@ class WebdigitAttributesDisplay extends Module {
 		// Load current value
 		foreach ( $this->config_inputs as $config_input ) {
 			$helper->fields_value [$config_input ['name']] = Configuration::get ( $config_input ['name'] );
+			foreach($config_input['values'] as $value){
+				$helper->fields_value [$config_input ['name'].'_'.$value['id_option']] = Configuration::get ( $config_input ['name'].'_'.$value['id_option'] );
+			}
 		}
 		
 		return $helper->generateForm ( $fields_form );
@@ -263,7 +286,7 @@ class WebdigitAttributesDisplay extends Module {
 		$allowed_controllers = array (
 				'index',
 				'product',
-				'category'
+				'category' 
 		);
 		$_controller = $this->context->controller;
 		// Flag si on se retrouve à ces endroits
@@ -271,6 +294,7 @@ class WebdigitAttributesDisplay extends Module {
 			$this->context->controller->addCss ( $this->_path . 'views/css/wdattrdispl.css', 'all' );
 			$this->context->controller->addJs ( $this->_path . 'views/js/wdattrdispl.js', 'all' );
 		}
+		// Affichage des déclinaisons
 		$wdAttrDisplRender = Configuration::get ( 'wd_attr_displ_render' );
 		
 		$wdAttrDisplSelectors = Configuration::get ( 'wd_attr_displ_selectors' );
@@ -281,13 +305,19 @@ class WebdigitAttributesDisplay extends Module {
 		// Position de l'affichage
 		$wdAttrDisplPosition = Configuration::get ( 'wd_attr_displ_position' );
 		
-		
+		// Affichage des déclinaisons sur les pages définis
+		$wdAttrDisplPageIndex = Configuration::get ( 'wd_attr_displ_page_index' );
+		$wdAttrDisplPageProduct = Configuration::get ( 'wd_attr_displ_page_product' );
+		$wdAttrDisplPageCategory = Configuration::get ( 'wd_attr_displ_page_category' );
 		
 		return '<script>
-					var wdAttrDisplRender = "'.$wdAttrDisplRender.'";
-					var wdAttrDisplSelectors = "'.$wdAttrDisplSelectors.'";
-					var wdAttrDisplType = "'.$wdAttrDisplType.'";
-					var wdAttrDisplPosition = "'.$wdAttrDisplPosition.'";
+					var wdAttrDisplRender = "' . $wdAttrDisplRender . '";
+					var wdAttrDisplSelectors = "' . $wdAttrDisplSelectors . '";
+					var wdAttrDisplType = "' . $wdAttrDisplType . '";
+					var wdAttrDisplPosition = "' . $wdAttrDisplPosition . '";
+					var wdAttrDisplPageIndex = "' . $wdAttrDisplPageIndex . '";
+					var wdAttrDisplPageProduct = "' . $wdAttrDisplPageProduct . '";
+					var wdAttrDisplPageCategory = "' . $wdAttrDisplPageCategory . '";
 				</script>';
 	}
 	public function hookDisplayProductPriceBlock($params) {
@@ -311,10 +341,8 @@ class WebdigitAttributesDisplay extends Module {
 	}
 	
 	// Chargé js pour back office
-	public function hookActionAdminControllerSetMedia($params){
-		
-		$this->context->controller->addJS($this->_path.'views/js/wdattrdispl_admin.js');
-		
+	public function hookActionAdminControllerSetMedia($params) {
+		$this->context->controller->addJS ( $this->_path . 'views/js/wdattrdispl_admin.js' );
 	}
 	public function generateUrl($id_attribute, $group_name, $attribute_name) {
 		// return '/' . $id_attribute . '-' . $group_name . '-' . $attribute_name;
@@ -352,7 +380,7 @@ class WebdigitAttributesDisplay extends Module {
 		$link_combinaison_array = array ();
 		foreach ( $combinaisons as $key => $comb ) {
 			$attribute_name = $comb ['attribute_name'];
-			//var_dump($attribute_name);
+			// var_dump($attribute_name);
 			$first_item = false;
 			$last_item = false;
 			if ($key == 0) {
@@ -399,10 +427,10 @@ class WebdigitAttributesDisplay extends Module {
 					$link_combinaison .= 'replace-';
 					// $group_name_combinaisons_string = str_replace ( '##link##', iconv('UTF-8','ASCII//TRANSLIT',strtolower ( $product_link . $link_combinaison )), $group_name_combinaisons_string );
 					$group_name_combinaisons_string = $this->convertStrUrl ( $product_link . $link_combinaison, $group_name_combinaisons_string );
-					//var_dump($group_name_combinaisons_string);
+					// var_dump($group_name_combinaisons_string);
 					$link_combinaison = '';
 				} else {
-					 //var_dump('add');
+					// var_dump('add');
 					// $link_combinaison .= 'add-';
 					// $link_combinaison .= '/' . $comb ['id_attribute'] . '-' . $comb ['group_name'] . '-' . $attribute_name;
 					$link_combinaison .= $this->generateUrl ( $comb ['id_attribute'], $comb ['group_name'], $attribute_name );
@@ -411,8 +439,8 @@ class WebdigitAttributesDisplay extends Module {
 				}
 			}
 			// $link_combinaison .= '/' . $comb ['id_attribute'] . '-' . $comb ['group_name'] . '-' . $attribute_name;
-			//var_dump($link_combinaison);
-			//var_dump($last_item);
+			// var_dump($link_combinaison);
+			// var_dump($last_item);
 			// $group_name_combinaisons_string .= $comb ['attribute_name'];
 			if ($last_item) {
 				$group_name_combinaisons_string .= '</a>';
@@ -424,8 +452,8 @@ class WebdigitAttributesDisplay extends Module {
 			$link_combinaison_array [$comb ['id_product_attribute']] .= $link_combinaison;
 		}
 		$group_name_string = substr ( $group_name_string, 0, - 1 );
-		//var_dump($link_combinaison_array);
-		//var_dump($group_name_combinaisons_string);
+		// var_dump($link_combinaison_array);
+		// var_dump($group_name_combinaisons_string);
 		$combinaisons ['group_name'] = $group_name;
 		$combinaisons ['group_name_string'] = $group_name_string;
 		$combinaisons ['group_name_combinaisons'] = $group_name_combinaisons;

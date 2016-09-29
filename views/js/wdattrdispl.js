@@ -1,10 +1,10 @@
 $(function(){
 	if ( wdAttrDisplRender == 'desactive'){
-		console.log( wdAttrDisplRender );
+		//console.log( wdAttrDisplRender );
 		$('.wdattrdisplay').css('visibility','hidden');
 	}
 	else {
-		console.log( wdAttrDisplRender );
+		//console.log( wdAttrDisplRender );
 		$('.wdattrdisplay').css('visibility','visible');
 	}
 	
@@ -135,6 +135,19 @@ $(function(){
 		$('.wdattrdisplay').removeAttr('style');
 	}
 	
+	// Affichage des déclinaisons sur les pages
+	if (wdAttrDisplPageIndex == 1) {
+		console.log('index');
+		if (wdAttrDisplPageProduct == 1){
+			console.log('product');
+		}
+		if (wdAttrDisplPageCategory == 1){
+			console.log('category');
+		}
+	}
 	
+	console.log(wdAttrDisplPageIndex);
+	console.log(wdAttrDisplPageProduct);
+	console.log(wdAttrDisplPageCategory);
 	
 });
